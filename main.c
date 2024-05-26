@@ -31,54 +31,88 @@ void myInit(void) {
   gluOrtho2D(-780, 780, -420, 420);
 }
 
-void draw_frame(const float time) {
-  const float v = 1.f + 0.1 * time;
-  const float j = v * time;
+struct leg {
+  union {
+    struct {
+      float foot[2];
+      float knee[2];
+    };
+    float v[4];
+  };
+};
 
-  glBegin(GL_QUADS);
-  for (int ix = -780; ix < 780; ix += 10)
-    for (int iy = -420; iy < 420; iy += 10) {
-      glColor4f(0.1 + 0.05 * cos(ix / 39.f),
-                1.f - 0.1f * cos(ix / 78.f) * sin(iy / 42.f), 0.1, 1.0);
-      glVertex2i(ix, iy);
-      glVertex2i(ix, iy + 10);
-      glVertex2i(ix + 10, iy + 10);
-      glVertex2i(ix + 10, iy);
-    }
-  glEnd();
+void interpolate(float f, const float *a, const float *b, float *result,
+                 int size) {
+  for (int i = 0; i < 2 * size; ++i) {
+    result[i] = (1.0f - f) * a[i] + f * b[i];
+  }
+}
+
+void draw_figure(double x, double y, double body_position) {
+  const struct leg left_leg1 = {-20, 0, -10, 50};
+  const struct leg right_leg1 = {20, 0, 10, 50};
+
+  const struct leg left_leg2 = {-40, 0, -10, 50};
+  const struct leg right_leg2 = {30, 20, 30, 50};
+
+  const struct leg left_leg3 = {-50, 20, -20, 50};
+  const struct leg right_leg3 = {0, 0, 0, 50};
+
+  const int nframe = 4;
+  const struct leg left_legs[4] = {left_leg2, left_leg3, right_leg2, right_leg3};
+  const struct leg right_legs[4] = {right_leg2, right_leg3, left_leg2, left_leg3};
+
+  const float body_fraction = body_position - (int)body_position;
+
+  struct leg left_leg, right_leg;
+  const int index = (int)(nframe * body_fraction);
+  const float f = nframe * body_fraction - index;
+  const int index1 = (index + 1) % nframe;
+  interpolate(f, left_legs[index].v, left_legs[index1].v, left_leg.v, 2);
+  interpolate(f, right_legs[index].v, right_legs[index1].v, right_leg.v, 2);
 
   glColor3f(0., 0., 0.);
-  glBegin(GL_POINTS);
-
-  // Iterate i up to 2*pi, i.e., 360 degree
-  // plot point with slight increment in angle,
-  // so, it will look like a continuous figure
-
-  // Loop is to draw outer circle
-  for (float i = 0; i < 6.29; i += 0.001) {
-    int x = 200 * cos(i);
-    int y = 200 * sin(i);
-    glVertex2i(x, y);
-  }
-
-  // Loop to make orbit of revolution
-  for (float i = 0; i < 6.29; i += 0.001) {
-    int x = 600 * cos(i);
-    int y = 100 * sin(i);
-    glVertex2i(x, y);
-  }
-  glEnd();
-
   glBegin(GL_LINE_STRIP);
-  const float x = -600 * cos(j);
-  const float y = -100 * sin(j);
-  const float w = 100;
-  glVertex2i(x - w, y - w);
-  glVertex2i(x - w, y + w);
-  glVertex2i(x + w, y + w);
-  glVertex2i(x + w, y - w);
-  glVertex2i(x - w, y - w);
+  glVertex2i(x, y + 100);
+  glVertex2i(x + left_leg.knee[0], y + left_leg.knee[1]);
+  glVertex2i(x + left_leg.foot[0], y + left_leg.foot[1]);
+  glVertex2i(x + left_leg.foot[0] + 20, y + left_leg.foot[1]);
   glEnd();
+  glBegin(GL_LINE_STRIP);
+  glVertex2i(x, y + 100);
+  glVertex2i(x + right_leg.knee[0], y + right_leg.knee[1]);
+  glVertex2i(x + right_leg.foot[0], y + right_leg.foot[1]);
+  glVertex2i(x + right_leg.foot[0] + 20, y + right_leg.foot[1]);
+  glEnd();
+  glBegin(GL_LINES);
+  /* torso */
+  glVertex2i(x, y + 100);
+  glVertex2i(x, y + 200);
+  /* arm 1 */
+  glVertex2i(x, y + 200);
+  glVertex2i(x - 20, y + 150);
+  /* arm 2 */
+  glVertex2i(x, y + 200);
+  glVertex2i(x + 20, y + 150);
+  glEnd();
+  glBegin(GL_LINE_LOOP);
+  for (int i = 0; i < 1000; ++i) {
+    glVertex2i(x + 20 * cos(0.002 * M_PI * i),
+               y + 220 + 20 * sin(0.002 * M_PI * i));
+  }
+  glEnd();
+}
+
+void draw_frame(const float time) {
+  const float ground_speed = 160.f;
+  const float body_speed = 1.5;
+  float position = -750 + ground_speed * time;
+  while (position > 750)
+    position -= 1500.f;
+  const float body_position = body_speed * time;
+
+  draw_figure(position - 50, 0, body_position);
+  draw_figure(position + 50, 0, body_position+0.3);
 }
 
 // Function to display animation
@@ -87,8 +121,9 @@ void display(void) {
 
   prevt = t;
   t = fmaxf(0.001f, get_time() - t0);
-  fps = 1.f / (t - prevt);
+  fps = 1.f / (t - prevt + 0.001f);
   prevfps = 0.99f * prevfps + 0.01f * fps;
+  printf("prevt: %g, t: %g, fps: %g, prevfps: %g\n", prevt, t, fps, prevfps);
   glClear(GL_COLOR_BUFFER_BIT);
   draw_frame(t);
   glRasterPos2i(-770, -410);
