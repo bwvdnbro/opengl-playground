@@ -59,8 +59,10 @@ void draw_figure(double x, double y, double body_position) {
   const struct leg right_leg3 = {0, 0, 0, 50};
 
   const int nframe = 4;
-  const struct leg left_legs[4] = {left_leg2, left_leg3, right_leg2, right_leg3};
-  const struct leg right_legs[4] = {right_leg2, right_leg3, left_leg2, left_leg3};
+  const struct leg left_legs[4] = {left_leg2, left_leg3, right_leg2,
+                                   right_leg3};
+  const struct leg right_legs[4] = {right_leg2, right_leg3, left_leg2,
+                                    left_leg3};
 
   const float body_fraction = body_position - (int)body_position;
 
@@ -112,7 +114,7 @@ void draw_frame(const float time) {
   const float body_position = body_speed * time;
 
   draw_figure(position - 50, 0, body_position);
-  draw_figure(position + 50, 0, body_position+0.3);
+  draw_figure(position + 50, 0, body_position + 0.3);
 }
 
 // Function to display animation
