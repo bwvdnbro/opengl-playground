@@ -20,7 +20,7 @@ int main() {
   character_init(character, r, box_size, 0.f);
 
   float *positions = NULL;
-  size_t num_positions = model_get_positions(model, &positions, 0.f);
+  size_t num_positions = model_get_positions(model, &positions, 0.f, box_size);
   printf("num_positions: %lu\n", num_positions);
   for (size_t i = 0; i < num_positions; i += 2)
     printf("  %.2f %.2f\n", positions[i], positions[i + 1]);
@@ -34,7 +34,7 @@ int main() {
   r = rand_r(&seed);
   character_init(character2, r, box_size, 0.f);
 
-  num_positions = model_get_positions(model, &positions, 1.f);
+  num_positions = model_get_positions(model, &positions, 1.f, box_size);
   printf("num_positions: %lu\n", num_positions);
   for (size_t i = 0; i < num_positions; i += 2)
     printf("  %.2f %.2f\n", positions[i], positions[i + 1]);
@@ -44,9 +44,9 @@ int main() {
   printf("=== BEGIN ===\n");
   float time = 0.f;
   for (int i = 0; i < 100; ++i) {
-    model_update(model, i, box_size);
+    model_update(model, time, box_size);
     for (int j = 0; j < 100; ++j) {
-      num_positions = model_get_positions(model, &positions, time);
+      num_positions = model_get_positions(model, &positions, time, box_size);
       printf("%g\t%g\t%g\t%g\n", positions[0], positions[1], positions[2],
              positions[3]);
       free(positions);

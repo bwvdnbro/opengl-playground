@@ -8,6 +8,10 @@ struct Model {
   struct Map *map;
   struct Character *characters;
 
+  /* model state */
+  float model_time;
+  float last_program_time;
+
   /* bookkeeping */
   struct Character *last_character;
   size_t num_characters;
@@ -22,10 +26,12 @@ void model_add_character(struct Model *const model,
                          struct Character *character);
 
 /* model update */
-void model_update(struct Model *const model, float time, const float *box_size);
+void model_start(struct Model *const model, float program_time);
+void model_update(struct Model *const model, float program_time,
+                  const float *box_size);
 
 /* model querying */
 size_t model_get_positions(const struct Model *const model, float **positions,
-                           float time);
+                           float program_time, const float *box_size);
 
 #endif

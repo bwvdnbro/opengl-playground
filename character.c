@@ -48,12 +48,14 @@ void character_destroy(struct Character *character) {
 
 static void set_new_direction_and_time(struct Character *const character,
                                        const float *box_size) {
-  const float u0 = ((float)rand_r(&character->seed)) / ((float)RAND_MAX + 1);
-  const float u1 = ((float)rand_r(&character->seed)) / ((float)RAND_MAX + 1);
-  character->vx = cosf(2.f * M_PI * u0);
-  character->vy = sinf(2.f * M_PI * u0);
-  const float next_dt =
-      fminf(10. * u1, get_max_dt_for_box(character, box_size));
+  float next_dt;
+  do {
+    const float u0 = ((float)rand_r(&character->seed)) / ((float)RAND_MAX + 1);
+    const float u1 = ((float)rand_r(&character->seed)) / ((float)RAND_MAX + 1);
+    character->vx = cosf(2.f * M_PI * u0);
+    character->vy = sinf(2.f * M_PI * u0);
+    next_dt = fminf(10. * u1, get_max_dt_for_box(character, box_size));
+  } while (next_dt < 1.e-5);
   character->next_time = character->current_time + next_dt;
 }
 
@@ -74,10 +76,11 @@ void character_update(struct Character *const character, float time,
   ASSERT(character, "Character is NULL!");
   while (time > character->next_time) {
     const float dt = character->next_time - character->current_time;
-    character->x += character->vx * dt;
-    character->y += character->vy * dt;
+    character->x =
+        fmaxf(0.f, fminf(character->x + character->vx * dt, box_size[0]));
+    character->y =
+        fmaxf(0.f, fminf(character->y + character->vy * dt, box_size[1]));
     character->current_time = character->next_time;
-    time = character->current_time;
     set_new_direction_and_time(character, box_size);
   }
   const float dt = time - character->current_time;
@@ -85,14 +88,19 @@ void character_update(struct Character *const character, float time,
   character->x += character->vx * dt;
   character->y += character->vy * dt;
   character->current_time = time;
+  LOG_CHARACTER(character);
 }
 
 void character_get_position(const struct Character *const character,
-                            float *const position, float time) {
+                            float *const position, float time,
+                            const float *box_size) {
   ASSERT(character, "Character is NULL!");
   const float dt = time - character->current_time;
-  ASSERT(dt > -1.e-5, "Negative time step - time: %.2f, current_time: %.2f!",
+  LOG("character: %p, dt: %.2f", character, dt);
+  ASSERT(dt >= -1.e-5, "Negative time step - time: %.2f, current_time: %.2f!",
          time, character->current_time);
-  position[0] = character->x + character->vx * dt;
-  position[1] = character->y + character->vy * dt;
+  position[0] =
+      fmaxf(0.f, fminf(character->x + character->vx * dt, box_size[0]));
+  position[1] =
+      fmaxf(0.f, fminf(character->y + character->vy * dt, box_size[1]));
 }

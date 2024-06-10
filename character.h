@@ -41,6 +41,7 @@ void character_update(struct Character *const character, float time,
 
 /* querying */
 void character_get_position(const struct Character *const character,
-                            float *const position, float time);
+                            float *const position, float time,
+                            const float *box_size);
 
 #endif
