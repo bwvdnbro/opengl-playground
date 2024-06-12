@@ -1,4 +1,4 @@
-CFLAGS = -g -O0 -fsanitize=address -fno-omit-frame-pointer
+CFLAGS = -g -O0 -fsanitize=address -fno-omit-frame-pointer -Wall -Werror -Wpedantic
 LDFLAGS = -fsanitize=address -fno-omit-frame-pointer
 
 # default rule. Ignores header file links
@@ -11,8 +11,14 @@ model.o: model.c Makefile model.h character.h error.h
 test_model.o: test_model.c Makefile model.h character.h error.h
 	gcc ${CFLAGS} -c -o test_model.o test_model.c
 
+test_view.o: test_view.c Makefile model.h character.h error.h
+	gcc ${CFLAGS} -c -o test_view.o test_view.c
+
 test_model: test_model.o model.o character.o
 	gcc ${CFLAGS} -o test_model -lm $^
+
+test_view: test_view.o model.o character.o
+	gcc ${CFLAGS} -o test_view -lm -lGL -lGLU -lglut $^
 
 clean:
 	rm *.o test_model

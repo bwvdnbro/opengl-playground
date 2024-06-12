@@ -36,6 +36,8 @@ struct Character *character_create() {
   character->current_time = 0.f;
   character->next_time = 0.f;
   character->seed = 0;
+
+  return character;
 }
 
 void character_destroy(struct Character *character) {
@@ -71,8 +73,8 @@ void character_init(struct Character *const character, unsigned int seed,
   set_new_direction_and_time(character, box_size);
 }
 
-void character_update(struct Character *const character, float time,
-                      const float *box_size) {
+float character_update(struct Character *const character, float time,
+                       const float *box_size) {
   ASSERT(character, "Character is NULL!");
   while (time > character->next_time) {
     const float dt = character->next_time - character->current_time;
@@ -89,6 +91,7 @@ void character_update(struct Character *const character, float time,
   character->y += character->vy * dt;
   character->current_time = time;
   LOG_CHARACTER(character);
+  return character->next_time;
 }
 
 void character_get_position(const struct Character *const character,
@@ -96,7 +99,7 @@ void character_get_position(const struct Character *const character,
                             const float *box_size) {
   ASSERT(character, "Character is NULL!");
   const float dt = time - character->current_time;
-  LOG("character: %p, dt: %.2f", character, dt);
+  LOG("character: %p, dt: %.2f", (void *)character, dt);
   ASSERT(dt >= -1.e-5, "Negative time step - time: %.2f, current_time: %.2f!",
          time, character->current_time);
   position[0] =

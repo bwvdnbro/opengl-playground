@@ -2,6 +2,8 @@
 #include "character.h"
 #include "error.h"
 
+#include <float.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -10,11 +12,17 @@ struct Model *model_create() {
   model->map = NULL;
   model->characters = NULL;
 
+  model->box_size[0] = 0.f;
+  model->box_size[1] = 0.f;
+
   model->model_time = 0.f;
   model->last_program_time = 0.f;
+  model->next_model_time = 0.f;
 
   model->last_character = NULL;
   model->num_characters = 0;
+
+  return model;
 }
 
 void model_destroy(struct Model *model) {
@@ -23,6 +31,11 @@ void model_destroy(struct Model *model) {
     character_destroy(model->characters);
   free(model);
   model = NULL;
+}
+
+void model_init(struct Model *const model, const float *box_size) {
+  model->box_size[0] = box_size[0];
+  model->box_size[1] = box_size[1];
 }
 
 void model_add_character(struct Model *const model,
@@ -42,21 +55,30 @@ void model_add_character(struct Model *const model,
 
 void model_start(struct Model *const model, float program_time) {
   model->last_program_time = program_time;
+  model_update(model, program_time);
 }
 
-void model_update(struct Model *const model, float program_time,
-                  const float *box_size) {
+void model_update(struct Model *const model, float program_time) {
   model->model_time += program_time - model->last_program_time;
   model->last_program_time = program_time;
+  if (model->model_time < model->next_model_time)
+    ;
+  float min_next_time = FLT_MAX;
   struct Character *current = model->characters;
   while (current != NULL) {
-    character_update(current, model->model_time, box_size);
+    const float next_time =
+        character_update(current, model->model_time, model->box_size);
+    ASSERT(next_time >= model->model_time,
+           "Next time is in the past - next_time: %g, model_time: %g",
+           next_time, model->model_time);
+    min_next_time = fminf(min_next_time, next_time);
     current = current->next;
   }
+  model->next_model_time = min_next_time;
 }
 
 size_t model_get_positions(const struct Model *const model, float **positions,
-                           float program_time, const float *box_size) {
+                           float program_time) {
   const float time =
       model->model_time + program_time - model->last_program_time;
   size_t num_positions = 2 * model->num_characters;
@@ -70,7 +92,7 @@ size_t model_get_positions(const struct Model *const model, float **positions,
       break;
     ASSERT(2 * ichar + 1 < num_positions, "More characters than expected: %lu!",
            ichar);
-    character_get_position(current, pos + 2 * ichar, time, box_size);
+    character_get_position(current, pos + 2 * ichar, time, model->box_size);
     current = current->next;
     ++ichar;
   }

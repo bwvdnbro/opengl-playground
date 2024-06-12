@@ -24,8 +24,8 @@ struct Character {
       " vx: %.2f, vy: %.2f\n"                                                  \
       " current_time: %.2f, next_time: %.2f\n"                                 \
       " seed: %u",                                                             \
-      c, c->next, c->x, c->y, c->vx, c->vy, c->current_time, c->next_time,     \
-      c->seed);
+      (void *)c, (void *)c->next, c->x, c->y, c->vx, c->vy, c->current_time,   \
+      c->next_time, c->seed);
 
 /* basics */
 struct Character *character_create();
@@ -36,8 +36,8 @@ void character_init(struct Character *const character, unsigned int seed,
                     const float *box_size, float time);
 
 /* modeling */
-void character_update(struct Character *const character, float time,
-                      const float *box_size);
+float character_update(struct Character *const character, float time,
+                       const float *box_size);
 
 /* querying */
 void character_get_position(const struct Character *const character,

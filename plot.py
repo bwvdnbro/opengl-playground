@@ -17,11 +17,10 @@ with open("output.txt", "r") as handle:
 
 positions = np.array(positions)
 
-pl.plot(positions[:,0], positions[:,1], "ro-")
-pl.plot(positions[:,2], positions[:,3], "bo-")
-pl.xlim(0., 100.)
-pl.ylim(0., 50.)
-#pl.gca().axis("off")
+pl.plot(positions[:,0], positions[:,1], "r-")
+pl.plot(positions[:,2], positions[:,3], "b-")
+pl.plot([0., 100., 100., 0., 0.], [0., 0., 50., 50., 0.], "k-")
+pl.gca().axis("off")
 pl.tight_layout()
 
 pl.savefig("output.png", bbox_inches="tight")
