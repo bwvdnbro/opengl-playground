@@ -65,12 +65,14 @@ void character_init(struct Character *const character, unsigned int seed,
                     const float *box_size, float time) {
   ASSERT(character, "Character is NULL!");
   character->seed = seed;
-  const float u0 = ((float)rand_r(&character->seed)) / ((float)RAND_MAX + 1);
-  const float u1 = ((float)rand_r(&character->seed)) / ((float)RAND_MAX + 1);
-  character->x = box_size[0] * u0;
-  character->y = box_size[1] * u1;
   character->current_time = time;
   set_new_direction_and_time(character, box_size);
+}
+
+void character_set_position(struct Character *const character,
+                            const float *position) {
+  character->x = position[0];
+  character->y = position[1];
 }
 
 float character_update(struct Character *const character, float time,

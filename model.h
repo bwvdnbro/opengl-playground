@@ -19,6 +19,9 @@ struct Model {
   /* bookkeeping */
   struct Character *last_character;
   size_t num_characters;
+
+  /* auxiliary variables */
+  unsigned int seed;
 };
 
 /* basics */
@@ -26,11 +29,12 @@ struct Model *model_create();
 void model_destroy(struct Model *model);
 
 /* setup */
-void model_init(struct Model *const model, const float *box_size);
+void model_init(struct Model *const model, const float *box_size,
+                unsigned int seed);
 
 /* character management */
-void model_add_character(struct Model *const model,
-                         struct Character *character);
+void model_add_character(struct Model *const model, struct Character *character,
+                         const float *position);
 
 /* model update */
 void model_start(struct Model *const model, float program_time);

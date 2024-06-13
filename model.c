@@ -22,6 +22,8 @@ struct Model *model_create() {
   model->last_character = NULL;
   model->num_characters = 0;
 
+  model->seed = 0;
+
   return model;
 }
 
@@ -33,13 +35,31 @@ void model_destroy(struct Model *model) {
   model = NULL;
 }
 
-void model_init(struct Model *const model, const float *box_size) {
+void model_init(struct Model *const model, const float *box_size,
+                unsigned int seed) {
   model->box_size[0] = box_size[0];
   model->box_size[1] = box_size[1];
+
+  model->seed = seed;
 }
 
-void model_add_character(struct Model *const model,
-                         struct Character *character) {
+static void generate_position(struct Model *const model, float *position) {
+  const float u0 = ((float)rand_r(&model->seed)) / ((float)RAND_MAX + 1);
+  const float u1 = ((float)rand_r(&model->seed)) / ((float)RAND_MAX + 1);
+  position[0] = model->box_size[0] * u0;
+  position[1] = model->box_size[1] * u1;
+}
+
+void model_add_character(struct Model *const model, struct Character *character,
+                         const float *position) {
+  if (position)
+    character_set_position(character, position);
+  else {
+    float random_position[2];
+    generate_position(model, random_position);
+    character_set_position(character, random_position);
+  }
+  character->current_time = model->model_time;
   character->next = NULL;
   if (!model->characters)
     model->characters = character;

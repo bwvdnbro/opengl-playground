@@ -34,6 +34,8 @@ void character_destroy(struct Character *character);
 /* initialization */
 void character_init(struct Character *const character, unsigned int seed,
                     const float *box_size, float time);
+void character_set_position(struct Character *const character,
+                            const float *position);
 
 /* modeling */
 float character_update(struct Character *const character, float time,

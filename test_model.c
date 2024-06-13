@@ -13,11 +13,11 @@ int main() {
   unsigned int seed = 42u;
   unsigned int r;
 
-  model_init(model, box_size);
+  model_init(model, box_size, seed);
 
   printf("Adding first character...\n");
   struct Character *character = character_create();
-  model_add_character(model, character);
+  model_add_character(model, character, NULL);
   r = rand_r(&seed);
   character_init(character, r, box_size, 0.f);
 
@@ -32,7 +32,7 @@ int main() {
 
   printf("Adding second character...\n");
   struct Character *character2 = character_create();
-  model_add_character(model, character2);
+  model_add_character(model, character2, NULL);
   r = rand_r(&seed);
   character_init(character2, r, box_size, 0.f);
 
