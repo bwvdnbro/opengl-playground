@@ -35,6 +35,8 @@ struct Character *character_create() {
   character->vy = 0.f;
   character->current_time = 0.f;
   character->next_time = 0.f;
+  character->direction = 0;
+
   character->seed = 0;
 
   return character;
@@ -48,15 +50,60 @@ void character_destroy(struct Character *character) {
   character = NULL;
 }
 
+static void get_velocity(int direction, float *velocity) {
+  switch (direction) {
+  case 0:
+    velocity[0] = -1.f;
+    velocity[1] = 0.f;
+    break;
+  case 1:
+    velocity[0] = -1.f;
+    ;
+    velocity[1] = -1.f;
+    break;
+  case 2:
+    velocity[0] = 0.f;
+    velocity[1] = -1.f;
+    break;
+  case 3:
+    velocity[0] = 1.f;
+    velocity[1] = -1.f;
+    break;
+  case 4:
+    velocity[0] = 1.f;
+    velocity[1] = 0.f;
+    break;
+  case 5:
+    velocity[0] = 1.f;
+    velocity[1] = 1.f;
+    break;
+  case 6:
+    velocity[0] = 0.f;
+    velocity[1] = 1.f;
+    break;
+  case 7:
+    velocity[0] = -1.f;
+    velocity[1] = 1.f;
+    break;
+  default:
+    velocity[0] = 0.f;
+    velocity[1] = 0.f;
+    break;
+  }
+  return;
+}
+
 static void set_new_direction_and_time(struct Character *const character,
                                        const float *box_size) {
   float next_dt;
   do {
+    character->direction = rand_r(&character->seed) % 8;
+    float velocity[2];
+    get_velocity(character->direction, velocity);
+    character->vx = velocity[0];
+    character->vy = velocity[1];
     const float u0 = ((float)rand_r(&character->seed)) / ((float)RAND_MAX + 1);
-    const float u1 = ((float)rand_r(&character->seed)) / ((float)RAND_MAX + 1);
-    character->vx = cosf(2.f * M_PI * u0);
-    character->vy = sinf(2.f * M_PI * u0);
-    next_dt = fminf(10. * u1, get_max_dt_for_box(character, box_size));
+    next_dt = fminf(10. * u0, get_max_dt_for_box(character, box_size));
   } while (next_dt < 1.e-5);
   character->next_time = character->current_time + next_dt;
 }

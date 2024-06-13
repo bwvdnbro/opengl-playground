@@ -12,6 +12,7 @@ struct Character {
   float vx, vy;
   float current_time;
   float next_time;
+  int direction;
 
   /* auxiliary variables */
   unsigned int seed;
