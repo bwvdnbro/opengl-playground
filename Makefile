@@ -24,7 +24,7 @@ test_view: test_view.o model.o character.o
 	gcc ${CFLAGS} -o test_view -lm -lGL -lGLU -lglut $^
 
 test_texture: test_texture.o texture.o
-	gcc ${CFLAGS} -o test_texture -lm $^
+	gcc ${CFLAGS} -o test_texture -lm -lGL -lGLU -lglut $^
 
 clean:
 	rm *.o test_model

@@ -4,7 +4,7 @@
 #include <stddef.h>
 
 struct Texture {
-  char *data;
+  unsigned char *data;
 
   size_t num_textures;
   size_t width;
@@ -20,6 +20,6 @@ void texture_destroy(struct Texture *const texture);
 size_t texture_get_size(const struct Texture *const texture,
                         size_t *dimensions);
 void texture_get(const struct Texture *const texture, size_t index,
-                 char *buffer);
+                 unsigned char *buffer);
 
 #endif

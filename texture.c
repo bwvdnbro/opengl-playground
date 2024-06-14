@@ -12,10 +12,10 @@ struct Texture *texture_init(const char *filename, size_t num_textures,
   texture->width = width;
   texture->height = height;
 
-  texture->offset_factor = width * height * 3;
+  texture->offset_factor = width * height * 4;
 
-  const size_t data_size = num_textures * width * height * 3;
-  texture->data = (char *)calloc(data_size, 1);
+  const size_t data_size = num_textures * width * height * 4;
+  texture->data = (unsigned char *)calloc(data_size, 1);
   FILE *file = fopen(filename, "rb");
   ASSERT(file, "Unable to open texture file %s", filename);
   const size_t size_read = fread(texture->data, 1, data_size, file);
@@ -37,7 +37,7 @@ size_t texture_get_size(const struct Texture *const texture,
 }
 
 void texture_get(const struct Texture *const texture, size_t index,
-                 char *buffer) {
-  memcpy(texture->data + index * texture->offset_factor, buffer,
+                 unsigned char *buffer) {
+  memcpy(buffer, texture->data + index * texture->offset_factor,
          texture->offset_factor);
 }
