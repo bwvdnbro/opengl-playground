@@ -3,7 +3,7 @@
 
 #include "stdio.h"
 
-//#define LOG_ENABLED
+#define LOG_ENABLED
 
 #define LOG_ALWAYS(message, ...)                                               \
   fprintf(stderr, "%s:%i: " message "\n", __FILE__, __LINE__, ##__VA_ARGS__);

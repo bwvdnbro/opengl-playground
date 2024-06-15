@@ -3,23 +3,16 @@
 
 #include <stddef.h>
 
-struct Texture {
-  unsigned char *data;
+struct Texture;
 
-  size_t num_textures;
-  size_t width;
-  size_t height;
-
-  size_t offset_factor;
-};
-
-struct Texture *texture_init(const char *filename, size_t num_textures,
-                             size_t width, size_t height);
+struct Texture *texture_init(const char *const filename,
+                             const size_t num_textures, const size_t width,
+                             const size_t height);
 void texture_destroy(struct Texture *const texture);
 
 size_t texture_get_size(const struct Texture *const texture,
-                        size_t *dimensions);
-void texture_get(const struct Texture *const texture, size_t index,
-                 unsigned char *buffer);
+                        size_t *const dimensions);
+void texture_get(const struct Texture *const texture, const size_t index,
+                 unsigned char *const buffer);
 
 #endif
