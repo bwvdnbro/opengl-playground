@@ -53,3 +53,10 @@ void texture_get(const struct Texture *const texture, const size_t index,
   memcpy(buffer, texture->data + index * texture->offset_factor,
          texture->offset_factor);
 }
+
+unsigned char *texture_get_ptr(const struct Texture *const texture,
+                               const size_t index, size_t *const dimensions) {
+  dimensions[0] = texture->width;
+  dimensions[1] = texture->height;
+  return texture->data + index * texture->offset_factor;
+}

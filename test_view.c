@@ -1,11 +1,14 @@
 #include "character.h"
+#include "character_sprite.h"
 #include "error.h"
 #include "model.h"
+#include "texture.h"
 
 #include <GL/freeglut.h>
-#include <GL/glut.h>
 #include <stdlib.h>
 #include <time.h>
+
+static const float time_factor = 2.f;
 
 float get_time() {
   struct timespec ts;
@@ -16,30 +19,29 @@ float get_time() {
 
 float global_t0 = 0.f;
 struct Model *global_model = NULL;
+struct Texture *global_texture = NULL;
 
 void idle_function() {
-  const float time = 10.f * (get_time() - global_t0);
+  const float time = time_factor * (get_time() - global_t0);
   model_update(global_model, time);
 }
 
 // Function to display animation
 void display() {
-  const float time = 10.f * (get_time() - global_t0);
-  float *pos;
-  size_t npos = model_get_positions(global_model, &pos, time);
-  //  LOG_ALWAYS("Number of positions: %lu", npos);
+  const float time = time_factor * (get_time() - global_t0);
+  void **sprites;
+  size_t nsprite = model_get_sprites(global_model, &sprites, time);
+  //  LOG_ALWAYS("Number of sprites: %lu", nsprite);
 
   glClear(GL_COLOR_BUFFER_BIT);
 
-  glColor3f(0.f, 0.f, 0.f);
-  glBegin(GL_POINTS);
-  for (size_t ipos = 0; ipos < npos; ipos += 2) {
-    LOG("Position: %g %g", pos[ipos], pos[ipos + 1]);
-    glVertex2f(pos[ipos], pos[ipos + 1]);
+  for (size_t isprite = 0; isprite < nsprite; ++isprite) {
+    const struct CharacterSprite *const sprite =
+        (const struct CharacterSprite *)sprites[isprite];
+    character_sprite_draw(sprite, global_texture);
   }
-  glEnd();
 
-  free(pos);
+  free(sprites);
 
   glFlush();
   glutSwapBuffers();
@@ -64,7 +66,7 @@ void setup_model(struct Model *const model) {
 void mouse_click(int button, int state, int pixel_x, int pixel_y) {
   if (button != GLUT_LEFT_BUTTON || state != GLUT_DOWN)
     return;
-  const float time = 10.f * (get_time() - global_t0);
+  const float time = time_factor * (get_time() - global_t0);
   const float w = glutGet(GLUT_WINDOW_WIDTH);
   const float h = glutGet(GLUT_WINDOW_HEIGHT);
   const float x = 100.f * (pixel_x / w);
@@ -90,6 +92,9 @@ void setup_glut() {
   glLoadIdentity();
   gluOrtho2D(0., 100., 0., 50.);
 
+  glEnable(GL_ALPHA_TEST);
+  glAlphaFunc(GL_GREATER, 0.5);
+
   glutDisplayFunc(display);
   glutIdleFunc(idle_function);
   glutMouseFunc(mouse_click);
@@ -106,6 +111,7 @@ int main(int argc, char **argv) {
   LOG("Creating model");
   global_model = model_create();
   setup_model(global_model);
+  global_texture = texture_init("texture.dat", 64u, 43u, 47u);
 
   model_start(global_model, get_time() - global_t0);
   LOG("Main loop");
@@ -113,5 +119,7 @@ int main(int argc, char **argv) {
 
   LOG("Destroying model");
   model_destroy(global_model);
+  texture_destroy(global_texture);
+
   return 0;
 }

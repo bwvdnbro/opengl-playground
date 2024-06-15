@@ -33,4 +33,7 @@ void character_get_position(const struct Character *const character,
                             float *const position, const float time,
                             const float *const box_size);
 
+void *character_get_sprite(struct Character *const character, const float time,
+                           const float *const box_size);
+
 #endif

@@ -15,4 +15,7 @@ size_t texture_get_size(const struct Texture *const texture,
 void texture_get(const struct Texture *const texture, const size_t index,
                  unsigned char *const buffer);
 
+unsigned char *texture_get_ptr(const struct Texture *const texture,
+                               const size_t index, size_t *const dimensions);
+
 #endif

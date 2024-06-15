@@ -189,3 +189,26 @@ size_t model_get_positions(const struct Model *const model,
   *positions = pos;
   return 2u * model->characters->size;
 }
+
+size_t model_get_sprites(struct Model *const model, void ***const sprites,
+                         const float program_time) {
+  const float time =
+      model->model_time + program_time - model->last_program_time;
+  const size_t num_sprites = model->characters->size;
+  void **const local_sprites = (void *)calloc(num_sprites, sizeof(void *));
+  size_t ichar = 0u;
+  struct CharacterLink *current = model->characters->first_link;
+  while (current != NULL) {
+    ASSERT(ichar < model->characters->size,
+           "Character bookkeeping is messed up!");
+    if (ichar == model->characters->size)
+      break;
+    ASSERT(ichar < num_sprites, "More characters than expected: %lu!", ichar);
+    local_sprites[ichar] =
+        character_get_sprite(current->character, time, model->box_size);
+    current = current->next;
+    ++ichar;
+  }
+  *sprites = local_sprites;
+  return num_sprites;
+}

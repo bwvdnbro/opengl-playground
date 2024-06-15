@@ -2,7 +2,6 @@
 #include "texture.h"
 
 #include <GL/freeglut.h>
-#include <GL/glut.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -82,4 +81,6 @@ int main(int argc, char **argv) {
   glutMainLoop();
 
   texture_destroy(global_texture);
+
+  return 0;
 }

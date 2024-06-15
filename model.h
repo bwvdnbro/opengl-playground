@@ -1,7 +1,7 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#include "stddef.h"
+#include <stddef.h>
 
 struct Character;
 struct Model;
@@ -26,5 +26,7 @@ void model_update(struct Model *const model, const float program_time);
 /* model querying */
 size_t model_get_positions(const struct Model *const model,
                            float **const positions, const float program_time);
+size_t model_get_sprites(struct Model *const model, void ***const sprites,
+                         const float program_time);
 
 #endif
