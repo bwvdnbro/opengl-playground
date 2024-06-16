@@ -74,7 +74,7 @@ int main(int argc, char **argv) {
   glLoadIdentity();
   gluOrtho2D(0., 100., 0., 50.);
 
-  global_texture = texture_init("texture.dat", 64u, 43u, 47u);
+  global_texture = texture_init("texture.dat", 64u);
   //  test_texture(global_texture);
 
   glutDisplayFunc(display);

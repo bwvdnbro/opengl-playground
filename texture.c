@@ -1,5 +1,6 @@
 #include "texture.h"
 #include "error.h"
+#include "log.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -15,22 +16,29 @@ struct Texture {
 };
 
 struct Texture *texture_init(const char *const filename,
-                             const size_t num_textures, const size_t width,
-                             const size_t height) {
+                             const size_t num_textures) {
   struct Texture *const texture =
       (struct Texture *)malloc(sizeof(struct Texture));
 
-  texture->num_textures = num_textures;
-  texture->width = width;
-  texture->height = height;
-
-  texture->offset_factor = width * height * 4u;
-
-  const size_t data_size = num_textures * width * height * 4u;
-  texture->data = (unsigned char *)calloc(data_size, 1u);
   FILE *const file = fopen(filename, "rb");
   ASSERT(file, "Unable to open texture file %s", filename);
-  const size_t size_read = fread(texture->data, 1u, data_size, file);
+  size_t sizes[4];
+  size_t size_read = fread(sizes, sizeof(size_t), 4u, file);
+  ASSERT(size_read == 4u, "Unable to read texture file %s", filename);
+  LOG_ALWAYS("Texture sizes: %lu %lu %lu %lu", sizes[0], sizes[1], sizes[2],
+             sizes[3]);
+  ASSERT(sizes[0] == num_textures, "Wrong number of textures");
+  ASSERT(sizes[3] == 4u, "Wrong number of color channels");
+
+  texture->num_textures = num_textures;
+  texture->width = sizes[2];
+  texture->height = sizes[1];
+
+  texture->offset_factor = sizes[1] * sizes[2] * 4u;
+
+  const size_t data_size = num_textures * sizes[1] * sizes[2] * 4u;
+  texture->data = (unsigned char *)calloc(data_size, 1u);
+  size_read = fread(texture->data, 1u, data_size, file);
   ASSERT(size_read == data_size, "Unable to read texture file %s", filename);
 
   return texture;

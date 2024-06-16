@@ -111,7 +111,7 @@ int main(int argc, char **argv) {
   LOG("Creating model");
   global_model = model_create();
   setup_model(global_model);
-  global_texture = texture_init("texture.dat", 64u, 43u, 47u);
+  global_texture = texture_init("texture.dat", 64u);
 
   model_start(global_model, get_time() - global_t0);
   LOG("Main loop");

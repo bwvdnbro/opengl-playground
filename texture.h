@@ -6,8 +6,7 @@
 struct Texture;
 
 struct Texture *texture_init(const char *const filename,
-                             const size_t num_textures, const size_t width,
-                             const size_t height);
+                             const size_t num_textures);
 void texture_destroy(struct Texture *const texture);
 
 size_t texture_get_size(const struct Texture *const texture,

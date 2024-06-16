@@ -16,7 +16,7 @@ character_sprite.o: character_sprite.c Makefile character_sprite.h error.h log.h
 model.o: model.c Makefile model.h character.h error.h log.h
 	gcc ${CFLAGS} -c -o model.o model.c
 
-texture.o: texture.c Makefile texture.h error.h
+texture.o: texture.c Makefile texture.h error.h log.h
 	gcc ${CFLAGS} -c -o texture.o texture.c
 
 test_model.o: test_model.c Makefile model.h character.h error.h log.h
