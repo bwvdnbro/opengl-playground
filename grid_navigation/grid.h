@@ -6,6 +6,8 @@ struct Cell;
 struct Grid *grid_create(const unsigned int nrow, const unsigned int ncol);
 void grid_destroy(struct Grid *const grid);
 
+void grid_get_dimensions(const struct Grid* const grid, unsigned int * const nrow, unsigned int * const ncol);
+
 struct GridIterator *grid_begin(struct Grid *const grid);
 void grid_iterator_destroy(struct GridIterator *const grid_iterator);
 struct GridIterator *

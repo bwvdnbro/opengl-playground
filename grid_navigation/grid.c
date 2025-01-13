@@ -24,6 +24,12 @@ void grid_destroy(struct Grid *const grid) {
   free(grid);
 }
 
+void grid_get_dimensions(const struct Grid* const grid, unsigned int * const nrow, unsigned int * const ncol)
+{
+  *nrow = grid->nrow;
+  *ncol = grid->ncol;
+}
+
 struct GridIterator {
   struct Grid *grid;
 
